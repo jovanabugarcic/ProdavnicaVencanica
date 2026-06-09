@@ -2,13 +2,13 @@
   "name": "prodavnica_vencanica",
   "version": "1.0.0",
   "description": "eCommerce aplikacija za prodaju vencanica",
-  "homepage": "https://github.com/jovanabugarcic/prodavnica_vencanica#readme",
+  "homepage": "https://github.com/jovanabugarcic/ProdavnicaVencanica#readme",
   "bugs": {
-    "url": "https://github.com/jovanabugarcic/prodavnica_vencanica/issues"
+    "url": "https://github.com/jovanabugarcic/ProdavnicaVencanica/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jovanabugarcic/prodavnica_vencanica.git"
+    "url": "git+https://github.com/jovanabugarcic/ProdavnicaVencanica.git"
   },
   "license": "MIT",
   "author": "Jovana Bugarcic",
