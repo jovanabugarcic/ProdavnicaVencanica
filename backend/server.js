@@ -1,5 +1,6 @@
 import dns from 'node:dns/promises';
 dns.setServers(["1.1.1.1", "1.0.0.1"]);
+import cors from 'cors'
 
 import express from 'express'
 import dotenv from 'dotenv'
@@ -17,6 +18,7 @@ const port= process.env.PORT || 5000;
 connectDB();
 
 const app = express();
+app.use(cors());
 
 // Body parser middleWare
 app.use(express.json());
