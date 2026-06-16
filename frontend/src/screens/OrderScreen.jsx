@@ -6,8 +6,8 @@ import { useSelector } from 'react-redux';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js' 
 import Message from '../components/Message'; 
 import Loader from '../components/Loader'; 
-import { useGetOrdersDetailsQuery, usePayOrderMutation, useGetPaypalClientIdQuery 
-} from '../slices/ordersApiSlice'; 
+import { useGetOrdersDetailsQuery, usePayOrderMutation, useGetPaypalClientIdQuery, 
+useDeliverOrderMutation } from '../slices/ordersApiSlice'; 
  
 const OrderScreen = () => { 
     const { id: orderId } = useParams(); 
@@ -15,6 +15,8 @@ const OrderScreen = () => {
 useGetOrdersDetailsQuery(orderId); 
  
     const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation(); 
+    const [deliverOrder, { isLoading: loadingDeliver }] = 
+useDeliverOrderMutation(); 
     const [{ isPending }, paypalDispatch] = usePayPalScriptReducer(); 
     const { data: paypal, isLoading: loadingPayPal, error: errorPayPal } = 
 useGetPaypalClientIdQuery(); 
@@ -80,6 +82,17 @@ useGetPaypalClientIdQuery();
         }).then((orderID) => { 
             return orderID; 
         }); 
+    } 
+ 
+    const deliverOrderHandler = async () => { 
+        try { 
+            await deliverOrder(orderId).unwrap(); 
+            refetch(); 
+            toast.success('Porudžbina je označena kao dostavljena'); 
+        } 
+        catch (err) { 
+            toast.error(err?.data?.message || err.message || 'Greška prilikom označavanja porudžbine kao dostavljene'); 
+        } 
     } 
  
     return isLoading ? ( 
@@ -198,7 +211,14 @@ useGetPaypalClientIdQuery();
  
                                 </ListGroup.Item> 
                             )} 
- 
+                            {loadingDeliver && <Loader />} 
+                            {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && ( 
+                                <ListGroup.Item> 
+                                    <Button type='button' className='btn btnblock' onClick={deliverOrderHandler}> 
+                                        Označi kao dostavljeno 
+                                    </Button> 
+                                </ListGroup.Item> 
+                            )} 
                         </ListGroup> 
                     </Card> 
                 </Col> 
@@ -207,4 +227,4 @@ useGetPaypalClientIdQuery();
     ); 
 }; 
  
-export default OrderScreen;
+export default OrderScreen; 

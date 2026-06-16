@@ -1,134 +1,197 @@
 import { useNavigate } from 'react-router-dom';
 import {
-  Badge,
-  Navbar,
-  Nav,
-  Container,
-  NavDropdown,
+    Badge,
+    Navbar,
+    Nav,
+    Container,
+    NavDropdown
 } from 'react-bootstrap';
-
 import {
-  FaShoppingCart,
-  FaUser,
+    FaShoppingCart,
+    FaUser,
 } from 'react-icons/fa';
 
 import logo from '../assets/logo.png';
 
 import { LinkContainer } from 'react-router-bootstrap';
-
 import { useSelector, useDispatch } from 'react-redux';
-
 import { useLogoutMutation } from '../slices/usersApiSlice';
 import { logout } from '../slices/authSlice';
 
 const Header = () => {
-  const { cartItems } = useSelector((state) => state.cart);
 
-  const { userInfo } = useSelector((state) => state.auth);
+    const { cartItems } = useSelector((state) => state.cart);
+    const { userInfo } = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-  const navigate = useNavigate();
+    const [logoutApiCall] = useLogoutMutation();
 
-  const [logoutApiCall] = useLogoutMutation();
+    const logoutHandler = async () => {
+        try {
+            await logoutApiCall().unwrap();
+            dispatch(logout());
+            navigate('/login');
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+    };
 
-  const logoutHandler = async () => {
-    try {
-      await logoutApiCall().unwrap();
+    return (
+        <header>
 
-      dispatch(logout());
+            
+            <div className="announcement-bar">
+                ✨ Nova Bridal Collection 2026 • Besplatna dostava za porudžbine preko 1000€ ✨
+            </div>
 
-      navigate('/login');
-    } catch (err) {
-      console.error(err);
-    }
-  };
+            <Navbar
+                expand="lg"
+                collapseOnSelect
+                className="lux-navbar"
+                sticky="top"
+            >
+                <Container>
 
-  return (
-    <header>
-      <Navbar
-        expand='lg'
-        collapseOnSelect
-        className='custom-navbar'
-      >
-        <Container>
-          <LinkContainer to='/'>
-            <Navbar.Brand className='brand-container'>
-              <img
-                src={logo}
-                alt='Wedding Logo'
-                className='navbar-logo'
-              />
+                    
+                    <LinkContainer to="/">
+                        <Navbar.Brand className="brand-wrapper">
+                            <img
+                                src={logo}
+                                alt="My Wedding Dress"
+                                width="65"
+                                height="65"
+                                className="brand-logo"
+                            />
 
-              <div className='brand-text'>
-                <span className='brand-title'>
-                  MY WEDDING DRESS
-                </span>
+                            <div className="brand-text">
+                                <div className="brand-name">
+                                    MY WEDDING DRESS
+                                </div>
 
-                <span className='brand-subtitle'>
-                  Bridal Boutique
-                </span>
-              </div>
-            </Navbar.Brand>
-          </LinkContainer>
+                                <div className="brand-subtitle">
+                                    Bridal Boutique
+                                </div>
+                            </div>
+                        </Navbar.Brand>
+                    </LinkContainer>
 
-          <Navbar.Toggle aria-controls='basic-navbar-nav' />
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-          <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='ms-auto align-items-center'>
-              <LinkContainer to='/cart'>
-                <Nav.Link className='nav-link-custom'>
-                  <FaShoppingCart />
+                    <Navbar.Collapse id="basic-navbar-nav">
 
-                  <span className='ms-2'>Cart</span>
+                        
+                        <Nav className="mx-auto nav-center">
 
-                  {cartItems.length > 0 && (
-                    <Badge
-                      pill
-                      bg='warning'
-                      text='dark'
-                      className='ms-2'
-                    >
-                      {cartItems.reduce(
-                        (a, c) => a + c.qty,
-                        0
-                      )}
-                    </Badge>
-                  )}
-                </Nav.Link>
-              </LinkContainer>
+                            <LinkContainer to="/">
+                                <Nav.Link>Početna</Nav.Link>
+                            </LinkContainer>
 
-              {userInfo ? (
-                <NavDropdown
-                  title={userInfo.name}
-                  id='username'
-                  className='nav-link-custom'
-                >
-                  <LinkContainer to='/profile'>
-                    <NavDropdown.Item>
-                      Profile
-                    </NavDropdown.Item>
-                  </LinkContainer>
+                            <LinkContainer to="/">
+                                <Nav.Link>Kolekcija</Nav.Link>
+                            </LinkContainer>
 
-                  <NavDropdown.Item onClick={logoutHandler}>
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <LinkContainer to='/login'>
-                  <Nav.Link className='nav-link-custom'>
-                    <FaUser />
+                            <LinkContainer to="/">
+                                <Nav.Link>Venčanice</Nav.Link>
+                            </LinkContainer>
 
-                    <span className='ms-2'>Login</span>
-                  </Nav.Link>
-                </LinkContainer>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </header>
-  );
+                            <LinkContainer to="/">
+                                <Nav.Link>Kontakt</Nav.Link>
+                            </LinkContainer>
+
+                        </Nav>
+
+                        
+                        <Nav className="align-items-center">
+
+                            <LinkContainer to="/cart">
+                                <Nav.Link className="icon-link">
+                                    <FaShoppingCart size={20} />
+
+                                    {cartItems.length > 0 && (
+                                        <Badge
+                                            pill
+                                            className="cart-badge"
+                                        >
+                                            {cartItems.reduce(
+                                                (a, c) => a + c.qty,
+                                                0
+                                            )}
+                                        </Badge>
+                                    )}
+                                </Nav.Link>
+                            </LinkContainer>
+
+                            
+
+                            {userInfo ? (
+                                <NavDropdown
+                                    title={
+                                        <span className="user-dropdown">
+                                            <FaUser className="me-2" />
+                                            {userInfo.name}
+                                        </span>
+                                    }
+                                    id="username"
+                                    align="end"
+                                >
+                                    <LinkContainer to="/profile">
+                                        <NavDropdown.Item>
+                                            Moj profil
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
+
+                                    <NavDropdown.Divider />
+
+                                    <NavDropdown.Item
+                                        onClick={logoutHandler}
+                                    >
+                                        Odjava
+                                    </NavDropdown.Item>
+                                </NavDropdown>
+                            ) : (
+                                <LinkContainer to="/login">
+                                    <Nav.Link className="icon-link">
+                                        <FaUser size={18} />
+                                    </Nav.Link>
+                                </LinkContainer>
+                            )}
+
+                            {userInfo && userInfo.isAdmin && (
+                                <NavDropdown
+                                    title="Admin"
+                                    id="adminmenu"
+                                    align="end"
+                                >
+                                    <LinkContainer to="/admin/productlist">
+                                        <NavDropdown.Item>
+                                            Products
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
+
+                                    <LinkContainer to="/admin/orderlist">
+                                        <NavDropdown.Item>
+                                            Orders
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
+
+                                    <LinkContainer to="/admin/userlist">
+                                        <NavDropdown.Item>
+                                            Users
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
+                                </NavDropdown>
+                            )}
+
+                        </Nav>
+
+                    </Navbar.Collapse>
+
+                </Container>
+            </Navbar>
+        </header>
+    );
 };
 
 export default Header;
