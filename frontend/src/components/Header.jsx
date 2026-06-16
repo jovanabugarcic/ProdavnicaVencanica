@@ -137,8 +137,8 @@ const Header = () => {
                                     align="end"
                                 >
                                     <LinkContainer to="/profile">
-                                        <NavDropdown.Item>
-                                            Moj profil
+                                        <NavDropdown.Item className="profile-dropdown-item">
+                                            My profile
                                         </NavDropdown.Item>
                                     </LinkContainer>
 
@@ -146,8 +146,9 @@ const Header = () => {
 
                                     <NavDropdown.Item
                                         onClick={logoutHandler}
+                                        className="logout-dropdown-item"
                                     >
-                                        Odjava
+                                        Logout
                                     </NavDropdown.Item>
                                 </NavDropdown>
                             ) : (
@@ -163,21 +164,22 @@ const Header = () => {
                                     title="Admin"
                                     id="adminmenu"
                                     align="end"
+                                    className="admin-dropdown"
                                 >
                                     <LinkContainer to="/admin/productlist">
-                                        <NavDropdown.Item>
+                                        <NavDropdown.Item className="admin-dropdown-item">
                                             Products
                                         </NavDropdown.Item>
                                     </LinkContainer>
 
                                     <LinkContainer to="/admin/orderlist">
-                                        <NavDropdown.Item>
+                                        <NavDropdown.Item className="admin-dropdown-item">
                                             Orders
                                         </NavDropdown.Item>
                                     </LinkContainer>
 
                                     <LinkContainer to="/admin/userlist">
-                                        <NavDropdown.Item>
+                                        <NavDropdown.Item className="admin-dropdown-item">
                                             Users
                                         </NavDropdown.Item>
                                     </LinkContainer>

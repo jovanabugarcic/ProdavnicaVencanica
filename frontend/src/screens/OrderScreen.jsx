@@ -1,18 +1,22 @@
-import { useEffect } from 'react'; 
-import { Link, useParams } from 'react-router-dom'; 
-import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'; 
-import { toast } from 'react-toastify'; 
-import { useSelector } from 'react-redux'; 
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js' 
-import Message from '../components/Message'; 
-import Loader from '../components/Loader'; 
-import { useGetOrdersDetailsQuery, usePayOrderMutation, useGetPaypalClientIdQuery, 
-useDeliverOrderMutation } from '../slices/ordersApiSlice'; 
- 
+import { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Row, Col, ListGroup, Image, Button, Card, Badge } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import Message from '../components/Message';
+import Loader from '../components/Loader';
+import {
+    useGetOrderDetailsQuery,
+    usePayOrderMutation,
+    useGetPaypalClientIdQuery,
+    useDeliverOrderMutation,
+} from '../slices/ordersApiSlice';
+
 const OrderScreen = () => { 
     const { id: orderId } = useParams(); 
     const { data: order, refetch, isLoading, isError } = 
-useGetOrdersDetailsQuery(orderId); 
+useGetOrderDetailsQuery(orderId); 
  
     const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation(); 
     const [deliverOrder, { isLoading: loadingDeliver }] = 
@@ -23,7 +27,7 @@ useGetPaypalClientIdQuery();
     const { userInfo } = useSelector((state) => state.auth); 
  
     useEffect(() => { 
-        if (!errorPayPal && !loadingPayPal && paypal.clientId) { 
+        if (!errorPayPal && !loadingPayPal && paypal?.clientId) { 
             const loadPaypalScript = async () => { 
                 paypalDispatch({ 
                     type: 'resetOptions', 
@@ -38,8 +42,7 @@ useGetPaypalClientIdQuery();
                 if (!window.paypal) { 
                     loadPaypalScript(); 
                 } else { 
-                    paypalDispatch({ type: 'setLoadingStatus', value: 'pending' 
-}); 
+                    paypalDispatch({ type: 'setLoadingStatus', value: 'pending' }); 
                 } 
             } 
         } 
@@ -95,136 +98,124 @@ useGetPaypalClientIdQuery();
         } 
     } 
  
-    return isLoading ? ( 
-        <Loader /> 
-    ) : isError ? ( 
-        <Message variant='danger'>Greška prilikom učitavanja porudžbine</Message> 
-    ) : ( 
-        <> 
-            <h1>Porudžbina {order._id}</h1> 
-            <Row> 
-                <Col md={8}> 
-                    <ListGroup variant='flush'> 
-                        <ListGroup.Item> 
-                            <h2>Adresa za isporuku</h2> 
-                            <p> 
-                                <strong>Ime: </strong> {order.user.name} 
-                            </p> 
-                            <p> 
-                                <strong>Email: </strong>{' '} 
-                                <a href={`mailto:${order.user.email}`}>{order.user.email}</a> 
-                            </p> 
-                            <p> 
-                                <strong>Adresa: </strong> 
-                                {order.shippingAddress.address}, {order.shippingAddress.city}{' '} 
-                                {order.shippingAddress.postalCode},{' '} 
-                                {order.shippingAddress.country} 
-                            </p> 
-                            {order.isDelivered ? ( 
-                                <Message variant='success'>Dostavljeno datuma: {order.deliveredAt}</Message> 
-                            ) : ( 
-                                <Message variant='danger'>Nije dostavljeno</Message> 
-                            )} 
-                        </ListGroup.Item> 
-                        <ListGroup.Item> 
-                            <h2>Način plaćanja</h2> 
-                            <p> 
-                                <strong>Metod: </strong> 
-                                {order.paymentMethod} 
-                            </p> 
-                            {order.isPaid ? ( 
-                                <Message variant='success'>Plaćeno datuma: {order.paidAt}</Message> 
-                            ) : ( 
-                                <Message variant='danger'>Nije plaćeno</Message> 
-                            )} 
-                        </ListGroup.Item> 
-                        <h2>Proizvodi</h2> 
-                        {order.orderItems.length === 0 ? ( 
-                            <Message>Porudžbina je prazna</Message> 
-                        ) : ( 
-                            <ListGroup.Item variant='flush'> 
-                                {order.orderItems.map((item, index) => ( 
-                                    <ListGroup.Item key={index}> 
-                                        <Row> 
-                                            <Col md={1}> 
-                                                <Image src={item.image} alt={item.name} fluid rounded /> 
-                                            </Col> 
-                                            <Col md={3}> 
-                                                <Link to={`/product/${item.product}`}>{item.name}</Link> 
-                                            </Col> 
-                                            <Col md={4}> 
-                                                {item.qty} x {item.price.toFixed(2)} RSD = {(item.qty * item.price).toFixed(2)} RSD 
-                                            </Col> 
-                                        </Row> 
-                                    </ListGroup.Item> 
-                                ))} 
-                            </ListGroup.Item> 
-                        )} 
-                    </ListGroup> 
-                </Col> 
-                <Col md={4}> 
-                    <Card> 
-                        <ListGroup variant='flush'> 
-                            <ListGroup.Item> 
-                                <h2>Ukupno</h2> 
-                            </ListGroup.Item> 
-                            <ListGroup.Item> 
-                                <Row> 
-                                    <Col>Proizvodi</Col> 
-                                    <Col>{order.itemsPrice.toFixed(2)} RSD</Col> 
-                                </Row> 
- 
-                                <Row> 
-                                    <Col>Cena dostave</Col> 
-                                    <Col>{order.shippingPrice.toFixed(2)} RSD</Col> 
-                                </Row> 
- 
-                                <Row> 
-                                    <Col>Pdv</Col> 
-                                    <Col>{order.taxPrice.toFixed(2)} RSD</Col> 
-                                </Row> 
- 
-                                <Row> 
-                                    <Col>Ukupna cena</Col> 
-                                    <Col>{order.totalPrice.toFixed(2)} RSD</Col> 
-                                </Row> 
-                            </ListGroup.Item> 
- 
-                            {!order.isPaid && ( 
-                                <ListGroup.Item> 
-                                    {loadingPay && <Loader />} 
- 
-                                    {isPending ? <Loader /> : ( 
-                                        <div> 
-                                            <Button onClick={onApproveTest} style={{ marginBottom: '10px' }}> 
-                                                Plati 
-                                            </Button> 
-                                            <div> 
-                                                <PayPalButtons 
-                                                    createOrder={createOrder} 
-                                                    onApprove={onApprove} 
-                                                    onError={onError} 
-                                                ></PayPalButtons> 
-                                            </div> 
-                                        </div> 
-                                    )} 
- 
-                                </ListGroup.Item> 
-                            )} 
-                            {loadingDeliver && <Loader />} 
-                            {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && ( 
-                                <ListGroup.Item> 
-                                    <Button type='button' className='btn btnblock' onClick={deliverOrderHandler}> 
-                                        Označi kao dostavljeno 
-                                    </Button> 
-                                </ListGroup.Item> 
-                            )} 
-                        </ListGroup> 
-                    </Card> 
-                </Col> 
-            </Row> 
-        </> 
-    ); 
-}; 
- 
-export default OrderScreen; 
+    return isLoading ? (
+        <Loader />
+    ) : isError ? (
+        <Message variant='danger'>Error loading order</Message>
+    ) : (
+        <div className='lux-screen-shell'>
+            <div className='d-flex justify-content-between align-items-center mb-4'>
+                <div>
+                    <p className='lux-subtitle mb-1'>Order details</p>
+                    <h1 className='lux-section-title mb-0'>Order #{order._id}</h1>
+                </div>
+                <Badge bg={order.isPaid ? 'success' : 'warning'} className='lux-pill'>
+                    {order.isPaid ? 'Paid' : 'Pending payment'}
+                </Badge>
+            </div>
+
+            <Row className='g-4'>
+                <Col lg={8}>
+                    <Card className='lux-panel'>
+                        <Card.Body>
+                            <h3 className='h4 mb-3'>Shipping information</h3>
+                            <div className='mb-4'>
+                                <p className='mb-1'><strong>Name:</strong> {order.user.name}</p>
+                                <p className='mb-1'><strong>Email:</strong> <a href={`mailto:${order.user.email}`}>{order.user.email}</a></p>
+                                <p className='mb-0'><strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city} {order.shippingAddress.postalCode}, {order.shippingAddress.country}</p>
+                            </div>
+
+                            <div className='mb-3'>
+                                {order.isDelivered ? (
+                                    <Message variant='success'>Delivered on {order.deliveredAt}</Message>
+                                ) : (
+                                    <Message variant='danger'>Not delivered yet</Message>
+                                )}
+                            </div>
+
+                            <div className='mb-3'>
+                                {order.isPaid ? (
+                                    <Message variant='success'>Paid on {order.paidAt}</Message>
+                                ) : (
+                                    <Message variant='warning'>Payment is still pending</Message>
+                                )}
+                            </div>
+
+                            <h3 className='h4 mb-3'>Payment method</h3>
+                            <p className='mb-0'><strong>Method:</strong> {order.paymentMethod}</p>
+                        </Card.Body>
+                    </Card>
+
+                    <Card className='lux-panel mt-4'>
+                        <Card.Body>
+                            <h3 className='h4 mb-3'>Products</h3>
+                            {order.orderItems.length === 0 ? (
+                                <Message>Your order is empty</Message>
+                            ) : (
+                                <ListGroup variant='flush'>
+                                    {order.orderItems.map((item, index) => (
+                                        <ListGroup.Item key={index} className='lux-list-item'>
+                                            <Row className='align-items-center'>
+                                                <Col xs={3} md={2}>
+                                                    <Image src={item.image} alt={item.name} fluid rounded style={{ maxHeight: '90px', objectFit: 'cover' }} />
+                                                </Col>
+                                                <Col xs={6} md={7}>
+                                                    <Link to={`/product/${item.product}`} className='text-decoration-none fw-semibold' style={{ color: '#3a2a18' }}>
+                                                        {item.name}
+                                                    </Link>
+                                                </Col>
+                                                <Col xs={3} md={3} className='text-end'>
+                                                    {item.qty} × {item.price.toFixed(2)} EUR
+                                                </Col>
+                                            </Row>
+                                        </ListGroup.Item>
+                                    ))}
+                                </ListGroup>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                <Col lg={4}>
+                    <Card className='lux-panel lux-summary-card' style={{ position: 'sticky', top: '90px' }}>
+                        <Card.Body>
+                            <p className='lux-subtitle mb-1'>Summary</p>
+                            <h2 className='lux-section-title mb-3' style={{ fontSize: '2rem' }}>Total</h2>
+                            <div className='lux-summary-row'><span>Items</span><strong>{order.itemsPrice.toFixed(2)} EUR</strong></div>
+                            <div className='lux-summary-row'><span>Shipping</span><strong>{order.shippingPrice.toFixed(2)} EUR</strong></div>
+                            <div className='lux-summary-row'><span>Tax</span><strong>{order.taxPrice.toFixed(2)} EUR</strong></div>
+                            <div className='lux-summary-row'><span>Total</span><strong>{order.totalPrice.toFixed(2)} EUR</strong></div>
+
+                            {!order.isPaid && (
+                                <div className='mt-3'>
+                                    {loadingPay && <Loader />}
+                                    {isPending ? <Loader /> : (
+                                        <>
+                                            <Button onClick={onApproveTest} className='lux-btn-primary w-100 mb-2'>
+                                                Pay now
+                                            </Button>
+                                            <PayPalButtons
+                                                createOrder={createOrder}
+                                                onApprove={onApprove}
+                                                onError={onError}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {loadingDeliver && <Loader />}
+                            {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                                <Button type='button' className='lux-btn-primary w-100 mt-3' onClick={deliverOrderHandler}>
+                                    Mark as delivered
+                                </Button>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </div>
+    );
+};
+
+export default OrderScreen;

@@ -120,13 +120,21 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route  GET /api/users 
 // @access Private/Admin 
 const getUsers = asyncHandler(async (req, res) => { 
-res.send('Get users'); 
+    const users = await User.find({}).select('-password');
+    res.status(200).json(users);
 }); 
 // @desc   Get user by ID 
 // @route  GET /api/users/:id 
 // @access Private/Admin 
 const getUserById = asyncHandler(async (req, res) => { 
-res.send('Get user by ID'); 
+    const user = await User.findById(req.params.id).select('-password');
+
+    if (user) {
+        res.status(200).json(user);
+    } else {
+        res.status(404);
+        throw new Error('Korisnik nije pronađen');
+    }
 }); 
 // @desc   Delete user 
 // @route  DELETE /api/users/:id 

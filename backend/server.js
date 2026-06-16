@@ -18,7 +18,10 @@ const port = process.env.PORT || 5000;
 connectDB(); 
 const app = express(); 
 
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
 // Body parser middlware 
 app.use(express.json()); 

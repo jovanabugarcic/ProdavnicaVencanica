@@ -96,13 +96,13 @@ const ProfileScreen = () => {
                         ></Form.Control> 
                     </Form.Group> 
  
-                    <Button type='submit' variant='primary'> 
-                        Ažurirajte profil 
+                    <Button type='submit' className='lux-btn-primary w-100 mt-3'> 
+                        Update profile 
                     </Button> 
                 </Form> 
             </Col> 
             <Col md={9}> 
-                <h2>Moje porudžbine</h2> 
+                <h2>My orders</h2> 
                 {isLoading ? ( 
                     <Loader /> 
                 ) : error ? ( 
